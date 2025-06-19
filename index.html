@@ -71,7 +71,7 @@
         .progress-fill {
             background: linear-gradient(90deg, #d4af37, #b8941f);
             height: 100%;
-            width: 16.66%;
+            width: calc(100% / 7); /* Ajustado para 7 pasos */
             border-radius: 4px;
             transition: width 0.5s ease;
         }
@@ -239,6 +239,10 @@
             min-width: 200px;
             color: #2c2c2c;
         }
+        
+        .input-group.align-right {
+            justify-content: flex-end;
+        }
 
         .gold-accent {
             color: #d4af37;
@@ -388,7 +392,11 @@
                     <span class="step-icon">🤖</span>
                     <span>IA Generativa</span>
                 </button>
-                <button class="step-button" onclick="goToStep(5)">
+                 <button class="step-button" onclick="goToStep(5)">
+                    <span class="step-icon">📤</span>
+                    <span>Notificaciones</span>
+                </button>
+                <button class="step-button" onclick="goToStep(6)">
                     <span class="step-icon">📋</span>
                     <span>Resumen</span>
                 </button>
@@ -732,6 +740,53 @@
         </div>
 
         <div class="module" id="module5">
+            <h2 class="module-title">6. Notificaciones Outbound de WhatsApp</h2>
+            <p style="margin-bottom: 20px; color: #666;">Ingrese la cantidad estimada de mensajes salientes (plantillas) por mes para cada categoría.</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tipo de Plantilla</th>
+                            <th>Valor por Notificación Adicional (USD)</th>
+                            <th>Cantidad Mensual Estimada</th>
+                            <th>Costo Mensual (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Marketing (out)</td>
+                            <td>$0.0150</td>
+                            <td><input type="number" id="notifMarketingQty" min="0" value="0" onchange="calculateNotificationCosts()"></td>
+                            <td class="cost-display" id="notifMarketingCost">$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Utility (out)</td>
+                            <td>$0.0024</td>
+                            <td><input type="number" id="notifUtilityQty" min="0" value="0" onchange="calculateNotificationCosts()"></td>
+                            <td class="cost-display" id="notifUtilityCost">$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Authentication (out)</td>
+                            <td>$0.0092</td>
+                            <td><input type="number" id="notifAuthenticationQty" min="0" value="0" onchange="calculateNotificationCosts()"></td>
+                            <td class="cost-display" id="notifAuthenticationCost">$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Services (in) <span style="font-style: italic; color: #888;">(Entrante, sin costo)</span></td>
+                            <td>-</td>
+                            <td><input type="number" id="notifServicesInQty" min="0" value="0" onchange="calculateNotificationCosts()"></td>
+                            <td class="cost-display">$0.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="text-align: right; margin-top: 15px;">
+                <strong>Subtotal Notificaciones (Mensual): <span class="gold-accent" id="notificationSubtotal">$0.00 USD</span></strong>
+            </div>
+        </div>
+
+        <div class="module" id="module6">
             <h2 class="module-title">Resumen de Costos</h2>
             
             <div class="table-container">
@@ -768,6 +823,11 @@
                             <td>IA - Operación Mensual</td>
                             <td class="gold-accent" id="summaryAIOperationQty">0</td>
                             <td class="cost-display" id="summaryAIMonthly">$0.00</td>
+                        </tr>
+                         <tr>
+                            <td id="summaryNotificationsConcept">Notificaciones Outbound WhatsApp</td>
+                            <td class="gold-accent" id="summaryNotificationsQty">0</td>
+                            <td class="cost-display" id="summaryNotificationsMonthly">$0.00</td>
                         </tr>
                         <tr class="total-row">
                             <td><strong>SUBTOTAL MENSUAL RECURRENTE</strong></td>
@@ -839,23 +899,36 @@
 
     <script>
         let currentStep = 0;
+        // Total de módulos ajustado a 7 (0 a 6)
+        const TOTAL_MODULES = 7; 
+
         let channelCost = 0;
         let channelsSelected = 0;
-        let selectedChannelNames = []; // Nuevo: para almacenar los nombres de los canales seleccionados
+        let selectedChannelNames = []; 
         let packageCost = 0;
         let packageConversations = 0;
         let packageLicenses = 0;
-        let selectedPackageName = ''; // Nuevo: para almacenar el nombre del paquete seleccionado
+        let selectedPackageName = ''; 
         let additionalInsightsCost = 0;
         let additionalInsightsQty = 0;
         let agentsCost = 0;
         let agentsQty = 0;
         let aiLoadingCost = 0;
         let aiMonthlyCost = 0;
-        let aiDetailsIncluded = false; // Flag para saber si la IA Generativa está seleccionada
-        let aiModelSelected = 'tokens'; // 'tokens' o 'messages'
+        let aiDetailsIncluded = false;
+        let aiModelSelected = 'tokens'; 
+        let notificationCost = 0; // Nuevo: Costo total mensual de notificaciones
+        let totalNotificationsQty = 0; // Nuevo: Cantidad total de notificaciones
 
-        const TRM_DEFAULT = 4200; // Valor por defecto de TRM
+        const TRM_DEFAULT = 4200; 
+
+        // Definir costos de notificación
+        const NOTIFICATION_PRICES = {
+            marketing: 0.0150,
+            utility: 0.0024,
+            authentication: 0.0092
+            // services_in es 0, no necesita ser incluido aquí para cálculos
+        };
 
         function updateFavicon(step) {
             const favicon = document.getElementById('favicon');
@@ -864,6 +937,9 @@
         }
 
         function goToStep(step) {
+            // Validar que el paso es válido
+            if (step < 0 || step >= TOTAL_MODULES) return;
+
             // Ocultar módulo actual
             document.getElementById(`module${currentStep}`).classList.remove('active');
             
@@ -884,7 +960,7 @@
             
             // Actualizar barra de progreso
             const progressFill = document.getElementById('progressFill');
-            const progress = ((step + 1) / 6) * 100;
+            const progress = ((step + 1) / TOTAL_MODULES) * 100; // Ajustado para TOTAL_MODULES
             progressFill.style.width = `${progress}%`;
             
             // Actualizar favicon
@@ -892,19 +968,19 @@
             
             // Actualizar botones de navegación (Anterior/Siguiente)
             document.getElementById('prevBtn').disabled = step === 0;
-            document.getElementById('nextBtn').textContent = step === 5 ? 'Finalizar' : 'Siguiente ➡';
+            document.getElementById('nextBtn').textContent = step === (TOTAL_MODULES - 1) ? 'Finalizar' : 'Siguiente ➡'; // Ajustado para TOTAL_MODULES
             
             currentStep = step;
 
             // Recalcular todo al cambiar de paso, especialmente al ir al resumen
-            if (currentStep === 5) {
+            if (currentStep === (TOTAL_MODULES - 1)) { // Ajustado para el último módulo
                 updateSummary();
                 calculateCurrencyConversion();
             }
         }
 
         function nextStep() {
-            if (currentStep < 5) {
+            if (currentStep < (TOTAL_MODULES - 1)) { // Ajustado para TOTAL_MODULES
                 goToStep(currentStep + 1);
             }
         }
@@ -916,26 +992,23 @@
         }
 
         function calculateChannelCosts() {
-            const channels = ['whatsapp', 'telegram', 'facebook', 'instagram', 'webchat']; // Agregado 'webchat'
-            selectedChannelNames = []; // Resetear nombres de canales
+            const channels = ['whatsapp', 'telegram', 'facebook', 'instagram', 'webchat'];
+            selectedChannelNames = []; 
             let selectedCount = 0;
             
             channels.forEach(channel => {
                 const checkbox = document.getElementById(channel);
                 if (checkbox.checked) {
                     selectedCount++;
-                    selectedChannelNames.push(checkbox.parentNode.nextElementSibling.textContent); // Obtener el nombre del canal
+                    selectedChannelNames.push(checkbox.parentNode.nextElementSibling.textContent); 
                 }
             });
 
             channelsSelected = selectedCount;
-            // El primer canal es gratuito, los adicionales son $100 mensual cada uno
             channelCost = selectedCount > 0 ? (selectedCount - 1) * 100 : 0;
             
-            // Actualizar la visualización de costos en la tabla de selección
             const rows = document.querySelectorAll('#module0 table tbody tr');
             
-            // Resetear todos los costos a su valor predeterminado antes de reasignar
             rows.forEach(row => {
                 const channelId = row.querySelector('input[type="checkbox"]').id;
                 const costCell = row.querySelector('.cost-display');
@@ -946,14 +1019,12 @@
                 }
             });
 
-            // Asignar el canal gratuito si solo hay uno seleccionado
             if (selectedCount === 1) {
                 const firstSelectedCheckbox = document.querySelector('#module0 input[type="checkbox"]:checked');
                 if (firstSelectedCheckbox) {
                     firstSelectedCheckbox.parentNode.nextElementSibling.nextElementSibling.textContent = '$0.00 (Primer canal gratuito)';
                 }
             }
-
 
             document.getElementById('channelSubtotal').textContent = `$${channelCost.toFixed(2)} USD`;
             updateSummary();
@@ -967,24 +1038,24 @@
                 packageConversations = parseInt(packageData[0]);
                 packageCost = parseFloat(packageData[1]);
                 packageLicenses = parseInt(packageData[2]);
-                selectedPackageName = packageData[3]; // Obtener el nombre del paquete
+                selectedPackageName = packageData[3]; 
                 
                 document.getElementById('packageSubtotal').textContent = `$${packageCost.toFixed(2)} USD`;
                 document.getElementById('includedLicenses').textContent = packageLicenses;
                 document.getElementById('packageLicensesDisplay').textContent = packageLicenses;
                 
-                calculateInsightsCosts(); // Recalcula insights si cambia el paquete
-                calculateAICosts(); // Recalcula IA si cambia el paquete (por el num de conversaciones)
+                calculateInsightsCosts();
+                calculateAICosts();
             } else {
                 packageCost = 0;
                 packageConversations = 0;
                 packageLicenses = 0;
-                selectedPackageName = ''; // Resetear nombre del paquete
+                selectedPackageName = ''; 
                 document.getElementById('packageSubtotal').textContent = '$0.00 USD';
                 document.getElementById('includedLicenses').textContent = '0';
                 document.getElementById('packageLicensesDisplay').textContent = '0';
-                calculateInsightsCosts(); // Recalcula insights a 0
-                calculateAICosts(); // Recalcula IA a 0
+                calculateInsightsCosts();
+                calculateAICosts();
             }
             
             updateSummary();
@@ -1018,7 +1089,6 @@
             
             if (aiDetailsIncluded) {
                 aiDetails.style.display = 'block';
-                // Mostrar la tabla de la opción seleccionada por defecto al activar la sección
                 const selectedAIMethod = document.querySelector('input[name="aiModelOption"]:checked').value;
                 document.getElementById('aiTokenModelTable').style.display = (selectedAIMethod === 'tokens' ? 'block' : 'none');
                 document.getElementById('aiMessageModelTable').style.display = (selectedAIMethod === 'messages' ? 'block' : 'none');
@@ -1048,11 +1118,9 @@
             
             aiModelSelected = document.querySelector('input[name="aiModelOption"]:checked').value;
 
-            // Mostrar/ocultar tablas de opciones de IA
             document.getElementById('aiTokenModelTable').style.display = (aiModelSelected === 'tokens' ? 'block' : 'none');
             document.getElementById('aiMessageModelTable').style.display = (aiModelSelected === 'messages' ? 'block' : 'none');
 
-            // Cálculos comunes
             const loadingCostPerUpdate = fileSize * 0.093;
             let updatesPerYear;
             switch(updateFrequency) {
@@ -1064,38 +1132,33 @@
             }
             aiLoadingCost = loadingCostPerUpdate * updatesPerYear;
 
-            const storageCost = fileSize * 1.7; // Mensual
+            const storageCost = fileSize * 1.7;
 
-            // Cálculos específicos del modelo seleccionado
             let tokenCostMonthly = 0;
             let messageCostMonthly = 0;
 
             if (aiModelSelected === 'tokens') {
                 const totalConversationsMonthly = packageConversations;
                 const totalAIMessagesMonthly = totalConversationsMonthly * aiMessages;
-                const totalTokensMonthly = totalAIMessagesMonthly * 880; // Suponiendo 880 tokens por mensaje (un estimado)
-                tokenCostMonthly = (totalTokensMonthly / 1000000) * 6.3;
+                const totalTokensMonthly = totalAIMessagesMonthly * 880; 
+                tokenCostMonthly = (totalTokensMonthly / 1000000) * NOTIFICATION_PRICES.token_cost_per_million; // Asumiendo un precio por millón de tokens
+                if (tokenCostMonthly < 0.01) tokenCostMonthly = 0; // Evitar valores muy pequeños
 
-                // Resetear costos del otro modelo para asegurar que no se suman
                 messageCostMonthly = 0; 
             } else if (aiModelSelected === 'messages') {
                 const totalConversationsMonthly = packageConversations;
                 const totalMessagesMonthly = totalConversationsMonthly * messagesPerConversation;
                 messageCostMonthly = (totalMessagesMonthly / 20000) * 111;
 
-                // Resetear costos del otro modelo para asegurar que no se suman
                 tokenCostMonthly = 0; 
             }
             
             aiMonthlyCost = storageCost + tokenCostMonthly + messageCostMonthly;
 
-            // Actualizar visualización en las tablas de IA Generativa
-            // Para el modelo de Tokens
             document.getElementById('loadingCostTokens').textContent = `$${loadingCostPerUpdate.toFixed(2)} (x${updatesPerYear}/año = $${aiLoadingCost.toFixed(2)})`;
             document.getElementById('storageCostTokens').textContent = `$${storageCost.toFixed(2)}`;
             document.getElementById('tokenCostTokens').textContent = `$${tokenCostMonthly.toFixed(2)}`;
 
-            // Para el modelo de Mensajes
             document.getElementById('loadingCostMessages').textContent = `$${loadingCostPerUpdate.toFixed(2)} (x${updatesPerYear}/año = $${aiLoadingCost.toFixed(2)})`;
             document.getElementById('storageCostMessages').textContent = `$${storageCost.toFixed(2)}`;
             document.getElementById('messageCostMessages').textContent = `$${messageCostMonthly.toFixed(2)}`;
@@ -1107,6 +1170,29 @@
         function updateAIDisplay() {
             document.getElementById('aiLoadingSubtotal').textContent = `$${aiLoadingCost.toFixed(2)} USD`;
             document.getElementById('aiMonthlySubtotal').textContent = `$${aiMonthlyCost.toFixed(2)} USD`;
+        }
+
+        // Nuevo: Función para calcular costos de notificaciones
+        function calculateNotificationCosts() {
+            const marketingQty = parseInt(document.getElementById('notifMarketingQty').value) || 0;
+            const utilityQty = parseInt(document.getElementById('notifUtilityQty').value) || 0;
+            const authenticationQty = parseInt(document.getElementById('notifAuthenticationQty').value) || 0;
+            const servicesInQty = parseInt(document.getElementById('notifServicesInQty').value) || 0; // Cantidad de servicios (in)
+
+            const marketingCost = marketingQty * NOTIFICATION_PRICES.marketing;
+            const utilityCost = utilityQty * NOTIFICATION_PRICES.utility;
+            const authenticationCost = authenticationQty * NOTIFICATION_PRICES.authentication;
+            // Services (in) no tiene costo, su costo es 0
+
+            notificationCost = marketingCost + utilityCost + authenticationCost;
+            totalNotificationsQty = marketingQty + utilityQty + authenticationQty + servicesInQty; // Suma todas las cantidades para el resumen
+
+            document.getElementById('notifMarketingCost').textContent = `$${marketingCost.toFixed(2)}`;
+            document.getElementById('notifUtilityCost').textContent = `$${utilityCost.toFixed(2)}`;
+            document.getElementById('notifAuthenticationCost').textContent = `$${authenticationCost.toFixed(2)}`;
+            document.getElementById('notificationSubtotal').textContent = `$${notificationCost.toFixed(2)} USD`;
+
+            updateSummary();
         }
 
         function updateSummary() {
@@ -1132,6 +1218,11 @@
             document.getElementById('summaryAgentsQty').textContent = agentsQty;
             document.getElementById('summaryAIOperationQty').textContent = aiDetailsIncluded && packageConversations > 0 ? (aiModelSelected === 'tokens' ? 'Modelo por Tokens' : 'Modelo por Mensajes') : 'No incluido';
 
+            // Actualizar notificaciones en el resumen
+            document.getElementById('summaryNotificationsConcept').textContent = 'Notificaciones Outbound WhatsApp';
+            document.getElementById('summaryNotificationsQty').textContent = totalNotificationsQty.toLocaleString();
+            document.getElementById('summaryNotificationsMonthly').textContent = `$${notificationCost.toFixed(2)}`;
+
             // Actualizar costos mensuales en la tabla de resumen
             document.getElementById('summaryChannelsMonthly').textContent = `$${channelCost.toFixed(2)}`;
             document.getElementById('summaryPackageMonthly').textContent = `$${packageCost.toFixed(2)}`;
@@ -1139,8 +1230,8 @@
             document.getElementById('summaryAgentsMonthly').textContent = `$${agentsCost.toFixed(2)}`;
             document.getElementById('summaryAIMonthly').textContent = `$${aiMonthlyCost.toFixed(2)}`;
 
-            // Calcular y mostrar el Subtotal Mensual Recurrente
-            const totalMonthlyRecurrent = channelCost + packageCost + additionalInsightsCost + agentsCost + aiMonthlyCost;
+            // Calcular y mostrar el Subtotal Mensual Recurrente (incluyendo notificaciones)
+            const totalMonthlyRecurrent = channelCost + packageCost + additionalInsightsCost + agentsCost + aiMonthlyCost + notificationCost;
             document.getElementById('totalMonthlyRecurrent').textContent = `$${totalMonthlyRecurrent.toFixed(2)}`;
 
             // Actualizar la tabla de Totales con Conversión
@@ -1173,9 +1264,10 @@
             calculatePackageCosts();
             calculateInsightsCosts();
             calculateAgentCosts();
-            toggleAISection(); // Llama a esta función para inicializar la visibilidad y cálculos de IA
+            toggleAISection(); 
+            calculateNotificationCosts(); // Nuevo: inicializar costos de notificación
             updateSummary();
-            calculateCurrencyConversion(); // Realiza la conversión inicial
+            calculateCurrencyConversion();
             updateFavicon(0);
         });
     </script>
