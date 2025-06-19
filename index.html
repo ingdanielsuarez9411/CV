@@ -454,63 +454,63 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td><input type="radio" name="package" value="3500-262.50-1" onchange="calculatePackageCosts()"></td>
+                            <td><input type="radio" name="package" value="3500-262.50-1-Básico" onchange="calculatePackageCosts()"></td>
                             <td>Básico</td>
                             <td>3,500</td>
                             <td class="gold-accent">1 licencia</td>
                             <td class="cost-display">$262.50</td>
                         </tr>
                         <tr>
-                            <td><input type="radio" name="package" value="5500-322.50-2" onchange="calculatePackageCosts()"></td>
+                            <td><input type="radio" name="package" value="5500-322.50-2-Estándar" onchange="calculatePackageCosts()"></td>
                             <td>Estándar</td>
                             <td>5,500</td>
                             <td class="gold-accent">2 licencias</td>
                             <td class="cost-display">$322.50</td>
                         </tr>
                         <tr>
-                            <td><input type="radio" name="package" value="8500-412.50-3" onchange="calculatePackageCosts()"></td>
+                            <td><input type="radio" name="package" value="8500-412.50-3-Profesional" onchange="calculatePackageCosts()"></td>
                             <td>Profesional</td>
                             <td>8,500</td>
                             <td class="gold-accent">3 licencias</td>
                             <td class="cost-display">$412.50</td>
                         </tr>
                         <tr>
-                            <td><input type="radio" name="package" value="10000-469.75-4" onchange="calculatePackageCosts()"></td>
+                            <td><input type="radio" name="package" value="10000-469.75-4-Empresarial" onchange="calculatePackageCosts()"></td>
                             <td>Empresarial</td>
                             <td>10,000</td>
                             <td class="gold-accent">4 licencias</td>
                             <td class="cost-display">$469.75</td>
                         </tr>
                         <tr>
-                            <td><input type="radio" name="package" value="30000-1388.11-5" onchange="calculatePackageCosts()"></td>
+                            <td><input type="radio" name="package" value="30000-1388.11-5-Corporativo I" onchange="calculatePackageCosts()"></td>
                             <td>Corporativo I</td>
                             <td>30,000</td>
                             <td class="gold-accent">5 licencias</td>
                             <td class="cost-display">$1,388.11</td>
                         </tr>
                         <tr>
-                            <td><input type="radio" name="package" value="60000-2706.82-6" onchange="calculatePackageCosts()"></td>
+                            <td><input type="radio" name="package" value="60000-2706.82-6-Corporativo II" onchange="calculatePackageCosts()"></td>
                             <td>Corporativo II</td>
                             <td>60,000</td>
                             <td class="gold-accent">6 licencias</td>
                             <td class="cost-display">$2,706.82</td>
                         </tr>
                         <tr>
-                            <td><input type="radio" name="package" value="90000-3956.12-7" onchange="calculatePackageCosts()"></td>
+                            <td><input type="radio" name="package" value="90000-3956.12-7-Corporativo III" onchange="calculatePackageCosts()"></td>
                             <td>Corporativo III</td>
                             <td>90,000</td>
                             <td class="gold-accent">7 licencias</td>
                             <td class="cost-display">$3,956.12</td>
                         </tr>
                         <tr>
-                            <td><input type="radio" name="package" value="120000-5136.01-8" onchange="calculatePackageCosts()"></td>
+                            <td><input type="radio" name="package" value="120000-5136.01-8-Enterprise I" onchange="calculatePackageCosts()"></td>
                             <td>Enterprise I</td>
                             <td>120,000</td>
                             <td class="gold-accent">8 licencias</td>
                             <td class="cost-display">$5,136.01</td>
                         </tr>
                         <tr>
-                            <td><input type="radio" name="package" value="150000-6246.50-9" onchange="calculatePackageCosts()"></td>
+                            <td><input type="radio" name="package" value="150000-6246.50-9-Enterprise II" onchange="calculatePackageCosts()"></td>
                             <td>Enterprise II</td>
                             <td>150,000</td>
                             <td class="gold-accent">9 licencias</td>
@@ -612,6 +612,7 @@
             </div>
 
             <div id="aiDetails" style="display: none;">
+                <h3 style="margin-top: 20px; margin-bottom: 15px; color: #2c2c2c;">Configuración de Consumo</h3>
                 <div class="input-group">
                     <label>Mensajes promedio por conversación:</label>
                     <input type="number" id="messagesPerConversation" min="1" value="10" onchange="calculateAICosts()">
@@ -637,7 +638,21 @@
                     </select>
                 </div>
 
-                <div class="table-container" style="margin-top: 20px;">
+                <h3 style="margin-top: 20px; margin-bottom: 15px; color: #2c2c2c;">Seleccione el Modelo de Costo de IA:</h3>
+                <div class="input-group">
+                    <label>
+                        <input type="radio" name="aiModelOption" value="tokens" checked onchange="calculateAICosts()">
+                        Opción 1: Modelo por Tokens
+                    </label>
+                    <label>
+                        <input type="radio" name="aiModelOption" value="messages" onchange="calculateAICosts()">
+                        Opción 2: Modelo por Mensajes
+                    </label>
+                </div>
+
+
+                <div id="aiTokenModelTable" class="table-container" style="margin-top: 20px;">
+                    <h4>Opción 1: Modelo por Tokens</h4>
                     <table>
                         <thead>
                             <tr>
@@ -652,25 +667,53 @@
                                 <td>Carga de Información</td>
                                 <td>$0.093 por MB × frecuencia anual</td>
                                 <td>Anual</td>
-                                <td class="cost-display" id="loadingCost">$0.00</td>
+                                <td class="cost-display" id="loadingCostTokens">$0.00</td>
                             </tr>
                             <tr>
                                 <td>Almacenamiento</td>
                                 <td>Archivo × $1.7 (por MB)</td>
                                 <td>Mensual</td>
-                                <td class="cost-display" id="storageCost">$0.00</td>
+                                <td class="cost-display" id="storageCostTokens">$0.00</td>
                             </tr>
                             <tr>
                                 <td>Consumo de Tokens</td>
                                 <td>$6.3 por millón de tokens</td>
                                 <td>Mensual</td>
-                                <td class="cost-display" id="tokenCost">$0.00</td>
+                                <td class="cost-display" id="tokenCostTokens">$0.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="aiMessageModelTable" class="table-container" style="margin-top: 20px; display: none;">
+                    <h4>Opción 2: Modelo por Mensajes</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Componente IA</th>
+                                <th>Descripción</th>
+                                <th>Tipo de Costo</th>
+                                <th>Valor (USD)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Carga de Información</td>
+                                <td>$0.093 por MB × frecuencia anual</td>
+                                <td>Anual</td>
+                                <td class="cost-display" id="loadingCostMessages">$0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Almacenamiento</td>
+                                <td>Archivo × $1.7 (por MB)</td>
+                                <td>Mensual</td>
+                                <td class="cost-display" id="storageCostMessages">$0.00</td>
                             </tr>
                             <tr>
                                 <td>Modelo de Mensajes</td>
                                 <td>$111 por cada 20,000 mensajes</td>
                                 <td>Mensual</td>
-                                <td class="cost-display" id="messageCost">$0.00</td>
+                                <td class="cost-display" id="messageCostMessages">$0.00</td>
                             </tr>
                         </tbody>
                     </table>
@@ -697,12 +740,12 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Canales Digitales</td>
+                            <td id="summaryChannelsConcept">Canales Digitales</td>
                             <td class="gold-accent" id="summaryChannelsQty">0</td>
                             <td class="cost-display" id="summaryChannelsMonthly">$0.00</td>
                         </tr>
                         <tr>
-                            <td>Paquete de Conversaciones</td>
+                            <td id="summaryPackageConcept">Paquete de Conversaciones</td>
                             <td class="gold-accent" id="summaryPackageQty">0</td>
                             <td class="cost-display" id="summaryPackageMonthly">$0.00</td>
                         </tr>
@@ -793,9 +836,11 @@
         let currentStep = 0;
         let channelCost = 0;
         let channelsSelected = 0;
+        let selectedChannelNames = []; // Nuevo: para almacenar los nombres de los canales seleccionados
         let packageCost = 0;
         let packageConversations = 0;
         let packageLicenses = 0;
+        let selectedPackageName = ''; // Nuevo: para almacenar el nombre del paquete seleccionado
         let additionalInsightsCost = 0;
         let additionalInsightsQty = 0;
         let agentsCost = 0;
@@ -803,6 +848,7 @@
         let aiLoadingCost = 0;
         let aiMonthlyCost = 0;
         let aiDetailsIncluded = false; // Flag para saber si la IA Generativa está seleccionada
+        let aiModelSelected = 'tokens'; // 'tokens' o 'messages'
 
         const TRM_DEFAULT = 4200; // Valor por defecto de TRM
 
@@ -866,11 +912,14 @@
 
         function calculateChannelCosts() {
             const channels = ['whatsapp', 'telegram', 'facebook', 'instagram'];
+            selectedChannelNames = []; // Resetear nombres de canales
             let selectedCount = 0;
             
             channels.forEach(channel => {
-                if (document.getElementById(channel).checked) {
+                const checkbox = document.getElementById(channel);
+                if (checkbox.checked) {
                     selectedCount++;
+                    selectedChannelNames.push(checkbox.parentNode.nextElementSibling.textContent); // Obtener el nombre del canal
                 }
             });
 
@@ -890,8 +939,6 @@
                 } else if (checkbox.checked) {
                     costCell.textContent = '$100.00';
                 } else {
-                    // Restablecer el costo a $100.00 si no es el único seleccionado y se desmarca,
-                    // o si nunca fue seleccionado
                     costCell.textContent = '$100.00';
                 }
                 channelIndex++;
@@ -902,13 +949,14 @@
         }
 
         function calculatePackageCosts() {
-            const selectedPackage = document.querySelector('input[name="package"]:checked');
+            const selectedPackageRadio = document.querySelector('input[name="package"]:checked');
             
-            if (selectedPackage) {
-                const packageData = selectedPackage.value.split('-');
+            if (selectedPackageRadio) {
+                const packageData = selectedPackageRadio.value.split('-');
                 packageConversations = parseInt(packageData[0]);
                 packageCost = parseFloat(packageData[1]);
                 packageLicenses = parseInt(packageData[2]);
+                selectedPackageName = packageData[3]; // Obtener el nombre del paquete
                 
                 document.getElementById('packageSubtotal').textContent = `$${packageCost.toFixed(2)} USD`;
                 document.getElementById('includedLicenses').textContent = packageLicenses;
@@ -920,6 +968,7 @@
                 packageCost = 0;
                 packageConversations = 0;
                 packageLicenses = 0;
+                selectedPackageName = ''; // Resetear nombre del paquete
                 document.getElementById('packageSubtotal').textContent = '$0.00 USD';
                 document.getElementById('includedLicenses').textContent = '0';
                 document.getElementById('packageLicensesDisplay').textContent = '0';
@@ -958,6 +1007,10 @@
             
             if (aiDetailsIncluded) {
                 aiDetails.style.display = 'block';
+                // Mostrar la tabla de la opción seleccionada por defecto al activar la sección
+                const selectedAIMethod = document.querySelector('input[name="aiModelOption"]:checked').value;
+                document.getElementById('aiTokenModelTable').style.display = (selectedAIMethod === 'tokens' ? 'block' : 'none');
+                document.getElementById('aiMessageModelTable').style.display = (selectedAIMethod === 'messages' ? 'block' : 'none');
                 calculateAICosts();
             } else {
                 aiDetails.style.display = 'none';
@@ -981,52 +1034,60 @@
             const aiMessages = parseInt(document.getElementById('aiMessages').value) || 0;
             const fileSize = parseFloat(document.getElementById('fileSize').value) || 0;
             const updateFrequency = parseInt(document.getElementById('updateFrequency').value) || 12;
-
-            // Cálculos
-            // a. Carga de Información (anual, sumando cada carga individual)
-            const loadingCostPerUpdate = fileSize * 0.093;
             
+            aiModelSelected = document.querySelector('input[name="aiModelOption"]:checked').value;
+
+            // Mostrar/ocultar tablas de opciones de IA
+            document.getElementById('aiTokenModelTable').style.display = (aiModelSelected === 'tokens' ? 'block' : 'none');
+            document.getElementById('aiMessageModelTable').style.display = (aiModelSelected === 'messages' ? 'block' : 'none');
+
+            // Cálculos comunes
+            const loadingCostPerUpdate = fileSize * 0.093;
             let updatesPerYear;
             switch(updateFrequency) {
-                case 1: // Mensual
-                    updatesPerYear = 12;
-                    break;
-                case 3: // Trimestral
-                    updatesPerYear = 4;
-                    break;
-                case 6: // Semestral
-                    updatesPerYear = 2;
-                    break;
-                case 12: // Anual
-                    updatesPerYear = 1;
-                    break;
-                default:
-                    updatesPerYear = 1;
+                case 1: updatesPerYear = 12; break;
+                case 3: updatesPerYear = 4; break;
+                case 6: updatesPerYear = 2; break;
+                case 12: updatesPerYear = 1; break;
+                default: updatesPerYear = 1;
             }
-            
             aiLoadingCost = loadingCostPerUpdate * updatesPerYear;
 
-            // b. Almacenamiento (mensual)
-            const storageCost = fileSize * 1.7;
+            const storageCost = fileSize * 1.7; // Mensual
 
-            // c. Modelo de consumo (tokens, mensual)
-            const totalConversationsMonthly = packageConversations;
-            const totalAIMessagesMonthly = totalConversationsMonthly * aiMessages;
-            const totalTokensMonthly = totalAIMessagesMonthly * 880; // Suponiendo 880 tokens por mensaje (un estimado)
-            const tokenCostMonthly = (totalTokensMonthly / 1000000) * 6.3;
+            // Cálculos específicos del modelo seleccionado
+            let tokenCostMonthly = 0;
+            let messageCostMonthly = 0;
 
-            // d. Modelo de mensajes (mensual)
-            const totalMessagesMonthly = totalConversationsMonthly * messagesPerConversation;
-            const messageCostMonthly = (totalMessagesMonthly / 20000) * 111;
+            if (aiModelSelected === 'tokens') {
+                const totalConversationsMonthly = packageConversations;
+                const totalAIMessagesMonthly = totalConversationsMonthly * aiMessages;
+                const totalTokensMonthly = totalAIMessagesMonthly * 880; // Suponiendo 880 tokens por mensaje (un estimado)
+                tokenCostMonthly = (totalTokensMonthly / 1000000) * 6.3;
 
-            // Costo mensual de operación de IA
+                // Resetear costos del otro modelo para asegurar que no se suman
+                messageCostMonthly = 0; 
+            } else if (aiModelSelected === 'messages') {
+                const totalConversationsMonthly = packageConversations;
+                const totalMessagesMonthly = totalConversationsMonthly * messagesPerConversation;
+                messageCostMonthly = (totalMessagesMonthly / 20000) * 111;
+
+                // Resetear costos del otro modelo para asegurar que no se suman
+                tokenCostMonthly = 0; 
+            }
+            
             aiMonthlyCost = storageCost + tokenCostMonthly + messageCostMonthly;
 
-            // Actualizar visualización en la tabla de IA Generativa
-            document.getElementById('loadingCost').textContent = `$${loadingCostPerUpdate.toFixed(2)} (x${updatesPerYear}/año = $${aiLoadingCost.toFixed(2)})`;
-            document.getElementById('storageCost').textContent = `$${storageCost.toFixed(2)}`;
-            document.getElementById('tokenCost').textContent = `$${tokenCostMonthly.toFixed(2)}`;
-            document.getElementById('messageCost').textContent = `$${messageCostMonthly.toFixed(2)}`;
+            // Actualizar visualización en las tablas de IA Generativa
+            // Para el modelo de Tokens
+            document.getElementById('loadingCostTokens').textContent = `$${loadingCostPerUpdate.toFixed(2)} (x${updatesPerYear}/año = $${aiLoadingCost.toFixed(2)})`;
+            document.getElementById('storageCostTokens').textContent = `$${storageCost.toFixed(2)}`;
+            document.getElementById('tokenCostTokens').textContent = `$${tokenCostMonthly.toFixed(2)}`;
+
+            // Para el modelo de Mensajes
+            document.getElementById('loadingCostMessages').textContent = `$${loadingCostPerUpdate.toFixed(2)} (x${updatesPerYear}/año = $${aiLoadingCost.toFixed(2)})`;
+            document.getElementById('storageCostMessages').textContent = `$${storageCost.toFixed(2)}`;
+            document.getElementById('messageCostMessages').textContent = `$${messageCostMonthly.toFixed(2)}`;
 
             updateAIDisplay();
             updateSummary();
@@ -1038,12 +1099,27 @@
         }
 
         function updateSummary() {
-            // Actualizar cantidades en la tabla de resumen
+            // Actualizar concepto de Canales Digitales
+            let channelsConceptText = "Canales Digitales";
+            if (selectedChannelNames.length > 0) {
+                channelsConceptText += ` (${selectedChannelNames.join(', ')})`;
+            }
+            document.getElementById('summaryChannelsConcept').textContent = channelsConceptText;
             document.getElementById('summaryChannelsQty').textContent = channelsSelected;
-            document.getElementById('summaryPackageQty').textContent = packageConversations > 0 ? '1 paquete' : '0'; // Asumimos 1 paquete si se selecciona
+
+            // Actualizar concepto y cantidad del Paquete de Conversaciones
+            let packageConceptText = "Paquete de Conversaciones";
+            if (selectedPackageName) {
+                packageConceptText += ` (${selectedPackageName})`;
+                document.getElementById('summaryPackageQty').textContent = `${packageConversations.toLocaleString()} convers.`;
+            } else {
+                document.getElementById('summaryPackageQty').textContent = '0';
+            }
+            document.getElementById('summaryPackageConcept').textContent = packageConceptText;
+            
             document.getElementById('summaryInsightsQty').textContent = additionalInsightsQty;
             document.getElementById('summaryAgentsQty').textContent = agentsQty;
-            document.getElementById('summaryAIOperationQty').textContent = aiDetailsIncluded && packageConversations > 0 ? 'Aplicable' : 'No incluido'; // Muestra "Aplicable" si se activó IA y hay paquete
+            document.getElementById('summaryAIOperationQty').textContent = aiDetailsIncluded && packageConversations > 0 ? (aiModelSelected === 'tokens' ? 'Modelo por Tokens' : 'Modelo por Mensajes') : 'No incluido';
 
             // Actualizar costos mensuales en la tabla de resumen
             document.getElementById('summaryChannelsMonthly').textContent = `$${channelCost.toFixed(2)}`;
@@ -1086,7 +1162,7 @@
             calculatePackageCosts();
             calculateInsightsCosts();
             calculateAgentCosts();
-            calculateAICosts(); // Asegura que los costos de IA se calculen si el checkbox está marcado inicialmente
+            toggleAISection(); // Llama a esta función para inicializar la visibilidad y cálculos de IA
             updateSummary();
             calculateCurrencyConversion(); // Realiza la conversión inicial
             updateFavicon(0);
