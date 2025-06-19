@@ -232,9 +232,10 @@
             transition: background-color 0.2s ease;
         }
 
-        tr:hover td {
+        /* QUITADO: Efecto hover en filas de tablas generales */
+        /* tr:hover td {
             background-color: #fafafa;
-        }
+        } */
 
         tr:last-child td {
             border-bottom: none;
@@ -300,6 +301,12 @@
             overflow: hidden;
         }
 
+        /* QUITADO: Efecto hover en filas de la tabla resumen */
+        .summary-table tr:hover td {
+            background-color: transparent; /* Eliminar el cambio de color al pasar el cursor */
+        }
+
+
         .summary-table th {
             background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
             color: #2c2c2c;
@@ -313,7 +320,18 @@
             background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
             color: #2c2c2c;
             font-weight: 700;
-            font-size: 1rem; /* Reducido */
+            font-size: 1.1rem; /* Mantenido o ligeramente aumentado para subtotales */
+        }
+        
+        /* Ajuste para los valores de subtotal y total en las tablas resumen */
+        .summary-table .cost-display {
+            color: white; /* Color blanco para contraste */
+            font-size: 1rem; /* Más grande */
+            font-weight: 800; /* Más audaz */
+        }
+
+        .summary-table .total-row .cost-display {
+            font-size: 1.5rem; /* Aún más grande para el total general */
         }
 
         .note {
