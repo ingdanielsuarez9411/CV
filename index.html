@@ -654,7 +654,7 @@
 
             <div class="module" id="module2">
                 <h2 class="module-title">3. Licencias Adicionales MindX Insights</h2>
-                <p style="margin-bottom: 20px; color: #666;">Su paquete incluye <span class="gold-accent" id="includedLicenses">0</span> licencias de MindX Insights. Puede agregar licencias adicionales por <span class="gold-accent">$25.5 USD</span> cada una (mensual).</p>
+                <p style="margin-bottom: 20px; color: #666;">Su paquete incluye <span class="gold-accent" id="includedLicenses">0</span> licencias de MindX Insights. Puede agregar licencias adicionales por <span class="gold-accent">USD $20</span> cada una (mensual).</p>
                 
                 <div class="input-group">
                     <label>Licencias adicionales de MindX Insights:</label>
@@ -681,8 +681,7 @@
                             <tr>
                                 <td>Licencias adicionales</td>
                                 <td class="gold-accent" id="additionalLicensesDisplay">0</td>
-                                <td>$25.50</td>
-                                <td class="cost-display" id="additionalInsightsCost">$0.00</td>
+                                <td>$20.00</td> <td class="cost-display" id="additionalInsightsCost">$0.00</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1023,11 +1022,13 @@
         let packageConversations = 0;
         let packageLicenses = 0;
         let selectedPackageName = ''; 
-        let additionalConversationCostPerUnit = 0; // NUEVO: Costo por conversación adicional fuera del paquete
-        let additionalConversationsQty = 0; // NUEVO: Cantidad de conversaciones adicionales
+        let additionalConversationCostPerUnit = 0; // Costo por conversación adicional fuera del paquete
+        let additionalConversationsQty = 0; // Cantidad de conversaciones adicionales
         
         let additionalInsightsCost = 0;
         let additionalInsightsQty = 0;
+        const INSIGHTS_LICENSE_COST = 20; // COSTO ACTUALIZADO AQUÍ
+        
         let agentsCost = 0;
         let agentsQty = 0;
         let aiLoadingCost = 0;
@@ -1140,7 +1141,7 @@
         function calculatePackageCosts() {
             const selectedPackageRadio = document.querySelector('input[name="package"]:checked');
             
-            additionalConversationsQty = parseInt(document.getElementById('additionalConversations').value) || 0; // Obtener cantidad adicional
+            additionalConversationsQty = parseInt(document.getElementById('additionalConversations').value) || 0; 
 
             if (selectedPackageRadio) {
                 // Formato de value: "conversaciones-costoBase-licencias-costoAdicionalPorConv-nombre"
@@ -1179,7 +1180,7 @@
 
         function calculateInsightsCosts() {
             additionalInsightsQty = parseInt(document.getElementById('additionalInsights').value) || 0;
-            additionalInsightsCost = additionalInsightsQty * 25.5;
+            additionalInsightsCost = additionalInsightsQty * INSIGHTS_LICENSE_COST; // USAR LA CONSTANTE
             
             document.getElementById('additionalLicensesDisplay').textContent = additionalInsightsQty;
             document.getElementById('additionalInsightsCost').textContent = `$${additionalInsightsCost.toFixed(2)}`;
