@@ -429,6 +429,11 @@
                             <td>Instagram Direct Message</td>
                             <td class="cost-display">$100.00</td>
                         </tr>
+                        <tr>
+                            <td><input type="checkbox" id="webchat" onchange="calculateChannelCosts()"></td>
+                            <td>WebChat (Widget o Embebido)</td>
+                            <td class="cost-display">$100.00</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -911,7 +916,7 @@
         }
 
         function calculateChannelCosts() {
-            const channels = ['whatsapp', 'telegram', 'facebook', 'instagram'];
+            const channels = ['whatsapp', 'telegram', 'facebook', 'instagram', 'webchat']; // Agregado 'webchat'
             selectedChannelNames = []; // Resetear nombres de canales
             let selectedCount = 0;
             
@@ -929,20 +934,26 @@
             
             // Actualizar la visualización de costos en la tabla de selección
             const rows = document.querySelectorAll('#module0 table tbody tr');
-            let channelIndex = 0;
-            channels.forEach(channel => {
-                const checkbox = document.getElementById(channel);
-                const costCell = rows[channelIndex].querySelector('.cost-display');
-                
-                if (checkbox.checked && selectedCount === 1) {
+            
+            // Resetear todos los costos a su valor predeterminado antes de reasignar
+            rows.forEach(row => {
+                const channelId = row.querySelector('input[type="checkbox"]').id;
+                const costCell = row.querySelector('.cost-display');
+                if (channelId === 'whatsapp') {
                     costCell.textContent = '$0.00 (Primer canal gratuito)';
-                } else if (checkbox.checked) {
-                    costCell.textContent = '$100.00';
                 } else {
                     costCell.textContent = '$100.00';
                 }
-                channelIndex++;
             });
+
+            // Asignar el canal gratuito si solo hay uno seleccionado
+            if (selectedCount === 1) {
+                const firstSelectedCheckbox = document.querySelector('#module0 input[type="checkbox"]:checked');
+                if (firstSelectedCheckbox) {
+                    firstSelectedCheckbox.parentNode.nextElementSibling.nextElementSibling.textContent = '$0.00 (Primer canal gratuito)';
+                }
+            }
+
 
             document.getElementById('channelSubtotal').textContent = `$${channelCost.toFixed(2)} USD`;
             updateSummary();
